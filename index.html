@@ -47,12 +47,13 @@
             const str = `${ti.value}\t${file.name}\t${b64}\t`
             size=new Blob([result.join('\n')+str]).size/1024/1024
 
-            if(size<5 && fileindex<fi.files.length-1)
+            if(size<5)
             {
                 result.push(str)
                 fileindex++;
             }
-            else
+
+            if(size>5 || fileindex==fi.files.length-1)
             {
                 download(result.join('\n'));
                 result=[]
@@ -63,11 +64,11 @@
     }
 
     b.addEventListener('click',async ()=>{
-        await csv();
         fileindex=0;
         result=[]
         result.push("Title\tSlug\tImage\t")
         size=0
+        await csv();
     })
 </script>
 </html>
