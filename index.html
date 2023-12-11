@@ -1,1 +1,73 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <input type="text" id="title"><br>
+    <input type="file" multiple id="images"><br>
+    <button>Generate</button>
+</body>
+<script>
+    let ti = document.querySelector('#title')
+    let fi = document.querySelector('#images')
+    let b = document.querySelector('button')
+    let result = []
+    result.push("Title\tSlug\tImage\t")
+    let fileindex = 0;
+    let size = 0;
+
+    const download = function (data) { 
+        const blob = new Blob([data], { type: 'text/csv' }); 
+        const url = window.URL.createObjectURL(blob) 
+        const a = document.createElement('a') 
+        a.setAttribute('href', url) 
+        a.setAttribute('download', ti.value+'.csv'); 
+        a.click() 
+    } 
+
+    const uri = (file)=>{
+        return new Promise((res)=>{
+            const reader = new FileReader();
+            reader.readAsDataURL(file)
+            reader.onloadend = () => {
+                    res(reader.result)
+                    }
+        })
+    }
+
+    async function csv(){
+        while(fileindex<fi.files.length)
+        {
+            let file = fi.files[fileindex]
+            let b64 = await uri(file)
+            const str = `${ti.value}\t${file.name}\t${b64}\t`
+            size=new Blob([result.join('\n')+str]).size/1024/1024
+
+            if(size<5 && fileindex<fi.files.length-1)
+            {
+                result.push(str)
+                fileindex++;
+            }
+            else
+            {
+                download(result.join('\n'));
+                result=[]
+                result.push("Title\tSlug\tImage\t")
+                size=0
+            }
+        }
+    }
+
+    b.addEventListener('click',async ()=>{
+        await csv();
+        fileindex=0;
+        result=[]
+        result.push("Title\tSlug\tImage\t")
+        size=0
+    })
+</script>
+</html>
