@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,6 +11,7 @@
     <input type="file" multiple id="images"><br>
     <button>Generate</button>
 </body>
+<script src="https://unpkg.com/compressorjs/dist/compressor.common.js"></script>
 <script>
     let ti = document.querySelector('#title')
     let fi = document.querySelector('#images')
@@ -40,14 +40,30 @@
         })
     }
 
+    const compress = async (f, q=1) =>{return await new Promise(res=>{
+        new Compressor(f,
+                       {quality: q,success:res}
+                      )
+    })}
+
+    const compressuntilgood = async (f) => {
+        let file = await uri(f)
+        let compression = 1.0
+        while((file.length/1000)>4700){
+            file = await uri((await compress(f,compression)))
+            compression-=0.01
+        }
+        return file
+    }
+
     async function csv(){
         while(fileindex<fi.files.length)
         {
             let file = fi.files[fileindex]
-            let b64 = await uri(file)
+            let b64 = await compressuntilfive(file)
             const str = `${ti.value}\t${file.name}\t${b64}\t`
             size=new Blob([result.join('\n')+str]).size/1000/1000
-
+            
             if(size<5)
             {
                 result.push(str)
