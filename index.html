@@ -6,7 +6,7 @@
     <title>Document</title>
 </head>
 <body>
-    <h1>v3 with compression</h1><br>
+    <h1>v4 with compression</h1><br>
     <input type="text" id="title"><br>
     <input type="file" multiple id="images"><br>
     <button>Generate</button>
@@ -60,7 +60,7 @@
         while(fileindex<fi.files.length)
         {
             let file = fi.files[fileindex]
-            let b64 = await compressuntilfive(file)
+            let b64 = await compressuntilgood(file)
             const str = `${ti.value}\t${file.name}\t${b64}\t`
             size=new Blob([result.join('\n')+str]).size/1000/1000
             
